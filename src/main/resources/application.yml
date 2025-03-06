@@ -1,0 +1,13 @@
+spring :
+  datasource:
+    url: jdbc:mysql://localhost:3306/ Student_Mangement
+    username: root
+    password: 1234
+  jpa :
+    show-sql: true
+    hibernate :
+      ddl-auto : update
+
+
+
+
