@@ -1,12 +1,12 @@
 spring :
   datasource:
-    url: jdbc:mysql://localhost:3306/ Student_Mangement
+    url: jdbc:mysql://localhost:3306/carRenter
     username: root
     password: 1234
   jpa :
     show-sql: true
     hibernate :
-      ddl-auto : update
+      ddl-auto : create
 
 
 
