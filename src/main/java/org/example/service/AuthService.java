@@ -1,8 +1,10 @@
 package org.example.service;
 
 import org.example.dto.SingupRequwest;
-import org.example.dto.User;
+import org.example.entity.UserEntity;
+
 
 public interface AuthService {
-    User createCustomer(SingupRequwest singupRequwest);
+    UserEntity createCustomer(SingupRequwest singupRequwest);
+    boolean hasCustomeremails(String email);
 }
