@@ -19,26 +19,25 @@ public class SimpleCorsFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        // Allow requests from a specific origin (e.g., Angular app running on localhost:4200)
         String origin = httpRequest.getHeader("Origin");
 
-        // Set CORS headers
+
         if (origin != null) {
-            httpResponse.setHeader("Access-Control-Allow-Origin", origin); // Or a fixed origin if required
+            httpResponse.setHeader("Access-Control-Allow-Origin", origin);
         } else {
-            httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:4200"); // Use a specific URL if no origin is found
+            httpResponse.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
         }
 
         httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
-        httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With"); // Better to list headers explicitly
+        httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
         httpResponse.setHeader("Access-Control-Max-Age", "3600"); // Cache preflight response for 1 hour
 
-        // Handle preflight requests
+
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
-            httpResponse.setStatus(HttpServletResponse.SC_OK); // Respond with 200 OK for OPTIONS requests
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
         } else {
-            // Pass the request down the filter chain
+
             chain.doFilter(request, response);
         }
     }

@@ -1,7 +1,7 @@
 package org.example.dto;
 
 import lombok.*;
-import org.example.util.UserRoles;
+import org.example.enums.UserRoles;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
