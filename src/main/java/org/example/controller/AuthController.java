@@ -2,6 +2,7 @@ package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.Authenticator;
+import org.apache.catalina.connector.Request;
 import org.example.dto.AuthoricationRespones;
 import org.example.dto.AuthricationRequwest;
 import org.example.dto.SingupRequwest;
@@ -61,41 +62,45 @@ public class AuthController {
     }
 
 
-    @PostMapping("/login")
-    public AuthoricationRespones createAuthenticationToken(@RequestBody AuthricationRequwest authenticationRequest) throws
-            BadCredentialsException,
-            DisabledException,
-            UsernameNotFoundException {
-        try {
+// @PostMapping("/login")
+//public AuthoricationRespones createAuthenticationToken(@RequestBody AuthricationRequwest authenticationRequest) throws
+//        BadCredentialsException,
+//        DisabledException,
+//        UsernameNotFoundException {
+//    try {
+//        authenticationManager.authenticate(
+//            new UsernamePasswordAuthenticationToken(
+//                authenticationRequest.getName(),
+//                authenticationRequest.getPassword()
+//            )
+//        );
+//    } catch (BadCredentialsException e) {
+//        throw new BadCredentialsException("Incorrect username or password.");
+//    }
+//
+//    final UserDetails userDetails = userService.userDetailsService().loadUserByUsername(authenticationRequest.getName());
+//    Optional<UserEntity> optionalUser = Optional.ofNullable(userRepository.findByName(userDetails.getUsername()));
+//    final String jwt = jwtUtill.generateToken(userDetails);
+//
+//    AuthoricationRespones authenticationResponse = new AuthoricationRespones();
+//    if (optionalUser.isPresent()) {
+//        authenticationResponse.setJwt(jwt);
+//        authenticationResponse.setUserid(Long.valueOf(String.valueOf(optionalUser.get().getId())));
+//        authenticationResponse.setUserRoles(optionalUser.get().getRoles());
+//    }
+//
+//    return authenticationResponse;
+//}
 
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
+   @PostMapping("/login")
+   public boolean helper(@RequestBody Request request ){
+        System.out.println(authenticationManager);
+     return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.name(),request.password())).isAuthenticated();
 
-                            authenticationRequest.getPassword(),
-                            authenticationRequest.getEmail()
-                    )
-            );
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Incorrect username or password.");
-        }
+   }
 
+    public record  Request(String name,String password){
 
-        final UserDetails userDetails = userService.userDetailsService().loadUserByUsername(authenticationRequest.getEmail());
-
-        Optional<UserEntity> optionalUser = userRepository.findByEmail(userDetails.getUsername());
-
-
-        final String jwt = jwtUtill.generateToken(userDetails);
-
-
-        AuthoricationRespones authenticationResponse = new AuthoricationRespones();
-        if (optionalUser.isPresent()) {
-            authenticationResponse.setJwt(jwt);
-            authenticationResponse.setJwt(String.valueOf(optionalUser.get().getId()));
-            authenticationResponse.setUserRoles(optionalUser.get().getUserRoles());
-        }
-
-        return authenticationResponse;
     }
         }
 

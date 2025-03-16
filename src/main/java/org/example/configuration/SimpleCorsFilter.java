@@ -31,7 +31,7 @@ public class SimpleCorsFilter implements Filter {
         httpResponse.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE");
         httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
         httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
-        httpResponse.setHeader("Access-Control-Max-Age", "3600"); // Cache preflight response for 1 hour
+        httpResponse.setHeader("Access-Control-Max-Age", "3600");
 
 
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {

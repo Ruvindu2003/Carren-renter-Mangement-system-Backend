@@ -1,4 +1,5 @@
 package org.example.service;
+import jakarta.annotation.PostConstruct;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import lombok.RequiredArgsConstructor;
@@ -7,13 +8,35 @@ import org.example.entity.UserEntity;
 import org.example.repository.UserRepository;
 import org.example.enums.UserRoles;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements  AuthService{
     final UserRepository userRepository;
     final ModelMapper modelMapper;
+
+
+
+    @PostConstruct
+    public  void  createAdminaccount(){
+        Optional<UserEntity> adminAccount = userRepository.findByRoles(UserRoles.ADMIN);
+        if (adminAccount.isEmpty()) {
+
+            UserEntity newAdminAccount = new UserEntity();
+            newAdminAccount.setName("ADMIN");
+            newAdminAccount.setRoles(UserRoles.ADMIN);
+            newAdminAccount.setEmail("ruvindusharadaha22@gmail.com");
+            newAdminAccount.setPassword(new BCryptPasswordEncoder().encode("1234567"));
+            userRepository.save(newAdminAccount);
+            System.out.println("Admin account created successfully.");
+        } else {
+            System.out.println("Admin account already exists.");
+        }
+    }
+
 
 
 
@@ -25,7 +48,7 @@ public class AuthServiceImpl implements  AuthService{
         UserEntity user = modelMapper.map(signupRequest, UserEntity.class);
 
 
-        user.setUserRoles(UserRoles.CUSTOMER);
+        user.setRoles(UserRoles.CUSTOMER);
 
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -43,11 +66,15 @@ public class AuthServiceImpl implements  AuthService{
         }
     }
 
-
-
     @Override
-    public boolean hasCustomeremails(String email) {
-        return userRepository.findByEmail(email).isPresent();
-
+    public boolean hasCustomeremails(String name) {
+        return false;
     }
+
+
+//    @Override
+//    public boolean hasCustomeremails(String email) {
+//        return userRepository.findByEmail(email).isPresent();
+//
+//    }
 }

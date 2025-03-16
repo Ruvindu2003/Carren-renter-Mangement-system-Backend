@@ -3,7 +3,6 @@ package org.example.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.enums.UserRoles;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,12 +26,12 @@ public class UserEntity implements UserDetails {
     private String email;
     private String password;
     @Enumerated(EnumType.STRING)
-    private UserRoles userRoles;
+    private UserRoles roles;
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(userRoles.name()));
+        return List.of(new SimpleGrantedAuthority(roles.name()));
     }
 
     @Override
@@ -58,5 +57,8 @@ public class UserEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
+    }
+
+    public void getUserRoles() {
     }
 }

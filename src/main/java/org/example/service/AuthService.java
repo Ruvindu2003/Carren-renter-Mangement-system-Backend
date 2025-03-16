@@ -6,5 +6,5 @@ import org.example.entity.UserEntity;
 
 public interface AuthService {
     UserEntity createCustomer(SingupRequwest singupRequwest);
-    boolean hasCustomeremails(String email);
+    boolean hasCustomeremails(String name);
 }
