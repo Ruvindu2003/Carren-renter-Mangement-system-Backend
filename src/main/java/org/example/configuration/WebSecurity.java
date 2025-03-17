@@ -5,7 +5,6 @@ import org.example.dto.UserPrinciple;
 import org.example.entity.UserEntity;
 import org.example.enums.UserRoles;
 import org.example.repository.UserRepository;
-import org.example.service.jwt.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,23 +16,18 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.util.Optional;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
 @EnableMethodSecurity
 public class WebSecurity {
-    private final JwtsAuthetcationFilter jwtsAuthetcationFilter;
+    private final JwtsAuthetcationFilter jwtAuthenticationFilter; // Fixed typo
     private final UserRepository userRepository;
 
     @Bean
@@ -48,8 +42,8 @@ public class WebSecurity {
                                 .requestMatchers("/api/user/**").hasAnyAuthority(UserRoles.CUSTOMER.name())
                                 .anyRequest().authenticated())
                 .sessionManagement(manager ->
-                        manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//                .addFilterBefore(jwtsAuthetcationFilter, UsernamePasswordAuthenticationFilter.class);
+                        manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
@@ -62,18 +56,19 @@ public class WebSecurity {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(username->{
-            UserEntity byName = userRepository.findByName(username);
+        authenticationProvider.setUserDetailsService(username -> {
+            UserEntity userEntity = userRepository.findByName(username);
+            if (userEntity == null) {
+                throw new UsernameNotFoundException("User not found");
+            }
             System.out.println("===================================================");
-            System.out.println(byName);
+            System.out.println(userEntity);
             System.out.println("===================================================");
-            return new UserPrinciple(byName);
+            return new UserPrinciple(userEntity);
         });
-        authenticationProvider.setPasswordEncoder(new BCryptPasswordEncoder());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
-
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

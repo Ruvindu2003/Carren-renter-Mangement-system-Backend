@@ -61,4 +61,8 @@ public class UserEntity implements UserDetails {
 
     public void getUserRoles() {
     }
+
+    public UserEntity get() {
+        return this;
+    }
 }

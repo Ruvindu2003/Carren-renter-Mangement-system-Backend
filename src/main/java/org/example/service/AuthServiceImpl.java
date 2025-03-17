@@ -68,7 +68,11 @@ public class AuthServiceImpl implements  AuthService{
 
     @Override
     public boolean hasCustomeremails(String name) {
-        return false;
+        UserEntity user = userRepository.findByName(name);
+
+        // Check if the user exists and has emails
+        return user != null && user.getName() != null && !user.getName().isEmpty();
+    }
     }
 
 
@@ -77,4 +81,4 @@ public class AuthServiceImpl implements  AuthService{
 //        return userRepository.findByEmail(email).isPresent();
 //
 //    }
-}
+

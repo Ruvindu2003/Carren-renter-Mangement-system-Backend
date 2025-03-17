@@ -12,6 +12,8 @@ import org.example.repository.UserRepository;
 import org.example.service.AuthService;
 
 import org.example.service.jwt.UserService;
+
+
 import org.example.utils.JwtUtill;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,47 +64,65 @@ public class AuthController {
     }
 
 
-// @PostMapping("/login")
-//public AuthoricationRespones createAuthenticationToken(@RequestBody AuthricationRequwest authenticationRequest) throws
-//        BadCredentialsException,
-//        DisabledException,
-//        UsernameNotFoundException {
-//    try {
-//        authenticationManager.authenticate(
-//            new UsernamePasswordAuthenticationToken(
-//                authenticationRequest.getName(),
-//                authenticationRequest.getPassword()
-//            )
-//        );
-//    } catch (BadCredentialsException e) {
-//        throw new BadCredentialsException("Incorrect username or password.");
-//    }
-//
-//    final UserDetails userDetails = userService.userDetailsService().loadUserByUsername(authenticationRequest.getName());
-//    Optional<UserEntity> optionalUser = Optional.ofNullable(userRepository.findByName(userDetails.getUsername()));
-//    final String jwt = jwtUtill.generateToken(userDetails);
-//
-//    AuthoricationRespones authenticationResponse = new AuthoricationRespones();
-//    if (optionalUser.isPresent()) {
-//        authenticationResponse.setJwt(jwt);
-//        authenticationResponse.setUserid(Long.valueOf(String.valueOf(optionalUser.get().getId())));
-//        authenticationResponse.setUserRoles(optionalUser.get().getRoles());
-//    }
-//
-//    return authenticationResponse;
-//}
-
-   @PostMapping("/login")
-   public boolean helper(@RequestBody Request request ){
-        System.out.println(authenticationManager);
-     return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.name(),request.password())).isAuthenticated();
-
-   }
-
-    public record  Request(String name,String password){
-
-    }
+    @PostMapping("/login")
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthricationRequwest authenticationRequest) {
+        try {
+            // Authenticate the user
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authenticationRequest.getEmail(),
+                            authenticationRequest.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password.");
+        } catch (DisabledException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is disabled.");
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found.");
         }
+
+
+        final UserDetails userDetails;
+        userDetails = userService.userDetailsService().loadUserByUsername(authenticationRequest.getEmail());
+
+
+        UserEntity optionalUser = (UserEntity) userRepository.findByName(userDetails.getUsername());
+
+
+        final String jwt = jwtUtill.generateToken(userDetails);
+
+        AuthoricationRespones authenticationResponse = new AuthoricationRespones();
+        if (optionalUser.isEnabled()) {
+            UserEntity user = optionalUser.get();
+            if (user.isEnabled()) {
+                authenticationResponse.setJwt(jwt);
+                authenticationResponse.setUserid(user.getId());
+                authenticationResponse.setUserRoles(user.getRoles());
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is disabled.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        return ResponseEntity.ok(authenticationResponse);
+    }
+}
+
+//  @PostMapping("/login")
+//  public boolean helper(@RequestBody Request request ){
+//        System.out.println(authenticationManager);
+//        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.name(),request.password())).isAuthenticated();
+//   }
+//
+//    public record  Request(String name,String password){
+//
+//    }
+
+
+
+        //}
 
 
 

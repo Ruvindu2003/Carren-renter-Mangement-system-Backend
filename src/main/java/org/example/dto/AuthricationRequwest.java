@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class AuthricationRequwest {
 
-    private String name;
+    private String email;
     private String password;
 
 }
